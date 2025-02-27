@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Copy the root variables and base styles from dashboard.html */
+        :root {
+            --bg-gradient-start: #f8fafc;
+            --bg-gradient-end: #e2e8f0;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #1a202c;
+            --text-secondary: #4a5568;
+            --button-bg: #3182ce;
+            --button-hover: #2c5282;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --border-color: rgba(203, 213, 224, 0.5);
+            --nav-height: 64px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+        }
+
+        /* Copy the navigation styles from dashboard.html */
+        nav {
+            background: var(--card-bg);
+            height: var(--nav-height);
+            box-shadow: 0 2px 4px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-right: 3rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--button-bg);
+            background: rgba(49, 130, 206, 0.1);
+        }
+
+        .nav-links a.active {
+            color: var(--button-bg);
+            background: rgba(49, 130, 206, 0.1);
+        }
+
+        .logout-btn {
+            margin-left: auto;
+        }
+
+        .logout-btn a {
+            padding: 0.5rem 1rem;
+            background: var(--button-bg);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .logout-btn a:hover {
+            background: var(--button-hover);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: calc(var(--nav-height) + 2rem) auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Form Styles */
+        form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: white;
+            color: var(--text-color);
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--button-bg);
+            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+            outline: none;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--button-hover);
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+
+        th {
+            background: rgba(49, 130, 206, 0.1);
+            color: var(--text-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(49, 130, 206, 0.05);
+        }
+
+        /* Search Inputs */
+        .search-box {
+            margin-bottom: 1rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 1rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .nav-brand {
+                margin-right: 1.5rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+        }
+
+        .csv-upload-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-divider {
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .form-divider::before,
+        .form-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background-color: var(--border-color);
+        }
+
+        .form-divider::before {
+            left: 0;
+        }
+
+        .form-divider::after {
+            right: 0;
+        }
+
+        .form-divider span {
+            background: var(--card-bg);
+            padding: 0 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .license-plate-input {
+            display: inline-flex;
+            align-items: center;
+            background: #f8fafc;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            gap: 2px;
+        }
+
+        .plate-part {
+            border: 1px solid #cbd5e0;
+            background: white;
+            font-family: 'Inter', monospace;
+            font-size: 0.875rem;
+            text-align: center;
+            border-radius: 0.25rem;
+            padding: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .plate-part:focus {
+            border-color: var(--button-bg);
+            box-shadow: 0 0 0 1px var(--button-bg);
+            outline: none;
+        }
+
+        .separator {
+            color: #718096;
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0 1px;
+        }
+
+        /* Specific widths for each part */
+        .state-part { width: 32px; }
+        .district-part { width: 28px; }
+        .letter-part { width: 28px; }
+        .number-part { width: 48px; }
+
+        .license-plate-group {
+            max-width: 250px;
+        }
+
+        /* Placeholder color */
+        .plate-part::placeholder {
+            color: #a0aec0;
+        }
+
+        /* Active state */
+        .plate-part:focus {
+            background: #fff;
+        }
+
+        /* Enhanced Button Styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--button-bg);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--button-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--button-bg);
+            border: 1px solid var(--button-bg);
+        }
+
+        .btn-outline:hover {
+            background: rgba(49, 130, 206, 0.1);
+        }
+
+        /* Enhanced Form Styles */
+        .registration-form {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .csv-upload-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .csv-form {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            padding: 0.75rem;
+            border: 2px dashed var(--border-color);
+            border-radius: 0.5rem;
+            width: 100%;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .file-input-wrapper input[type="file"]:hover {
+            border-color: var(--button-bg);
+        }
+
+        .section-title {
+            color: var(--text-color);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* Enhanced Table Styles */
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            margin: 0;
+        }
+
+        th {
+            background: #f8fafc;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            font-size: 0.875rem;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* Search Box Enhancement */
+        .search-box {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            max-width: 300px;
+            padding: 0.75rem 1rem;
+            padding-left: 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Form Group Enhancements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .license-plate-input {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .plate-part {
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            font-size: 1rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .plate-part:focus {
+            border-color: var(--button-bg);
+            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+        }
+
+        /* Enhanced Single Vehicle Registration Styles */
+        .single-registration {
+            margin-top: 2rem;
+        }
+
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .license-plate-group {
+            max-width: 400px;
+        }
+
+        .form-actions {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Small Button Style */
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Input Enhancements */
+        input, select {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--button-bg);
+            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+            outline: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M8 10.5l-4-4h8l-4 4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.875rem center;
+            padding-right: 2.5rem;
+            appearance: none;
+        }
+
+        .registration-form {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Helper Text Enhancement */
+        .helper-text {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .compact-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .make-model-group, .owner-details-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .license-plate-input {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: white;
+        }
+
+        .plate-part {
+            width: auto;
+            padding: 0.375rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+        }
+
+        #state-code { width: 45px; }
+        #district-code { width: 35px; }
+        #letter-code { width: 35px; }
+        #number-code { width: 60px; }
+
+        .form-actions {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .registration-form {
+            padding: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            margin-bottom: 0.25rem;
+            font-size: 0.813rem;
+        }
+
+        input, select {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">Speed Monitor</div>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('management') }}" class="active">Vehicle Management</a>
+            <a href="{{ url_for('setting') }}">Settings</a>
+        </div>
+        <div class="logout-btn">
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section">
+            <h2>Vehicle Registration</h2>
+            
+            <div class="csv-upload-section">
+                <h3 class="section-title">Bulk Upload Vehicles</h3>
+                <p class="helper-text">Upload CSV file with vehicle details</p>
+                <form action="{{ url_for('upload_csv') }}" method="POST" enctype="multipart/form-data" class="csv-form">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="csv-file" name="csv-file" accept=".csv" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        Upload CSV
+                    </button>
+                    <a href="{{ url_for('download_template') }}" class="btn btn-outline">
+                        Download Template
+                    </a>
+                </form>
+            </div>
+
+            <div class="form-divider">
+                <span>OR</span>
+            </div>
+
+            <div class="single-registration">
+                <h3 class="section-title">Single Vehicle Registration</h3>
+                <form action="{{ url_for('add_vehicle') }}" method="POST" id="vehicleForm" class="registration-form">
+                    <div class="compact-form">
+                        <div class="form-group license-plate-group">
+                            <label>License Plate*</label>
+                            <div class="license-plate-input">
+                                <input type="text" id="state-code" name="state-code" required 
+                                       placeholder="MH" maxlength="2" class="plate-part state-part"
+                                       pattern="[A-Z]{2}" title="State code (e.g., MH)">
+                                <span class="separator">-</span>
+                                <input type="text" id="district-code" name="district-code" required 
+                                       placeholder="01" maxlength="2" class="plate-part district-part"
+                                       pattern="[0-9]{2}" title="District code (e.g., 01)">
+                                <span class="separator">-</span>
+                                <input type="text" id="letter-code" name="letter-code" required 
+                                       placeholder="AB" maxlength="2" class="plate-part letter-part"
+                                       pattern="[A-Z]{1,2}" title="Series (e.g., AB)">
+                                <span class="separator">-</span>
+                                <input type="text" id="number-code" name="number-code" required 
+                                       placeholder="1234" maxlength="4" class="plate-part number-part"
+                                       pattern="[0-9]{4}" title="Number (e.g., 1234)">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Make & Model*</label>
+                                <div class="make-model-group">
+                                    <select id="vehicle-make" name="vehicle-make" required>
+                                        <option value="">Make</option>
+                                        <option value="Maruti">Maruti</option>
+                                        <option value="Hyundai">Hyundai</option>
+                                        <option value="Tata">Tata</option>
+                                        <option value="Mahindra">Mahindra</option>
+                                        <option value="Honda">Honda</option>
+                                        <option value="Toyota">Toyota</option>
+                                    </select>
+                                    <input type="text" id="vehicle-model" name="vehicle-model" 
+                                           placeholder="Model" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Owner Details*</label>
+                                <div class="owner-details-group">
+                                    <input type="text" id="owner-name" name="owner-name" 
+                                           placeholder="Owner Name" required 
+                                           pattern="[A-Za-z\s]+">
+                                    <input type="tel" id="owner-contact" name="owner-contact" 
+                                           placeholder="Contact (10 digits)" required 
+                                           pattern="[6-9][0-9]{9}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-sm">Register</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Vehicle List</h2>
+            <div class="search-box">
+                <input type="text" id="vehicle-search" placeholder="Search by License Plate" oninput="searchVehicles(this.value)">
+            </div>
+            <div class="table-container">
+                <table id="vehicle-table">
+                    <tr>
+                        <th>License Plate</th>
+                        <th>Vehicle Make</th>
+                        <th>Vehicle Model</th>
+                        <th>Owner's Name</th>
+                        <th>Owner's Contact</th>
+                    </tr>
+                    {% for vehicle in vehicles %}
+                    <tr>
+                        <td>{{ vehicle['License Plate'] }}</td>
+                        <td>{{ vehicle['Vehicle Make'] }}</td>
+                        <td>{{ vehicle['Vehicle Model'] }}</td>
+                        <td>{{ vehicle['Owner\'s Name'] }}</td>
+                        <td>{{ vehicle['Owner\'s Contact'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Owner Information Management</h2>
+            <label for="owner-search">Search by Owner Name: </label>
+            <input type="text" id="owner-search" name="owner-search" placeholder="Enter owner's name" oninput="searchOwners(this.value)">
+            <br><br>
+            
+            <table id="owners-table">
+                <tr>
+                    <th>Owner's Name</th>
+                    <th>Contact</th>
+                    <th>Vehicle(s)</th>
+                </tr>
+                {% for owner_name, data in owners.items() %}
+                <tr>
+                    <td>{{ owner_name }}</td>
+                    <td>{{ data['contact'] }}</td>
+                    <td>{{ data['vehicles']|join(', ') }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Violation History per Vehicle</h2>
+            <label for="violation-search">Search by License Plate: </label>
+            <input type="text" id="violation-search" name="violation-search" placeholder="Enter license plate" oninput="searchViolations(this.value)">
+            <br><br>
+            
+            <table id="violations-table">
+                <tr>
+                    <th>License Plate</th>
+                    <th>Violation Date</th>
+                    <th>Violation Type</th>
+                    <th>Action Taken</th>
+                </tr>
+                {% for record in violation_records %}
+                <tr>
+                    <td>{{ record['License Plate'] }}</td>
+                    <td>{{ record['Violation Date'].strftime('%Y-%m-%d') }}</td>
+                    <td>{{ record['Violation Type'] }}</td>
+                    <td>{{ record['Action Taken'] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <script>
+    async function searchVehicles(term) {
+        const response = await fetch(`/api/search_vehicles?term=${term}`);
+        const vehicles = await response.json();
+        updateVehicleTable(vehicles);
+    }
+
+    async function searchViolations(licensePlate) {
+        const response = await fetch(`/api/search_violations?license_plate=${licensePlate}`);
+        const violations = await response.json();
+        updateViolationsTable(violations);
+    }
+
+    function searchOwners(term) {
+        const table = document.getElementById('owners-table');
+        const rows = table.getElementsByTagName('tr');
+        
+        for (let i = 1; i < rows.length; i++) {
+            const ownerName = rows[i].cells[0].textContent.toLowerCase();
+            rows[i].style.display = ownerName.includes(term.toLowerCase()) ? '' : 'none';
+        }
+    }
+
+    function updateVehicleTable(vehicles) {
+        const tbody = document.getElementById('vehicle-table').getElementsByTagName('tbody')[0];
+        tbody.innerHTML = '<tr><th>License Plate</th><th>Vehicle Make</th><th>Vehicle Model</th><th>Owner\'s Name</th><th>Owner\'s Contact</th></tr>';
+        
+        vehicles.forEach(vehicle => {
+            const row = tbody.insertRow();
+            row.insertCell().textContent = vehicle['License Plate'];
+            row.insertCell().textContent = vehicle['Vehicle Make'];
+            row.insertCell().textContent = vehicle['Vehicle Model'];
+            row.insertCell().textContent = vehicle['Owner\'s Name'];
+            row.insertCell().textContent = vehicle['Owner\'s Contact'];
+        });
+    }
+
+    function updateViolationsTable(violations) {
+        const tbody = document.getElementById('violations-table').getElementsByTagName('tbody')[0];
+        tbody.innerHTML = '<tr><th>License Plate</th><th>Violation Date</th><th>Violation Type</th><th>Action Taken</th></tr>';
+        
+        violations.forEach(violation => {
+            const row = tbody.insertRow();
+            row.insertCell().textContent = violation['License Plate'];
+            row.insertCell().textContent = new Date(violation['Violation Date']).toLocaleDateString();
+            row.insertCell().textContent = violation['Violation Type'];
+            row.insertCell().textContent = violation['Action Taken'];
+        });
+    }
+
+    // Add this to your existing script section
+    document.querySelectorAll('.plate-part').forEach(input => {
+        input.addEventListener('input', function(e) {
+            // Convert to uppercase for state and letter codes
+            if (this.id === 'state-code' || this.id === 'letter-code') {
+                this.value = this.value.toUpperCase();
+            }
+            
+            // Remove non-numeric characters for district and number codes
+            if (this.id === 'district-code' || this.id === 'number-code') {
+                this.value = this.value.replace(/\D/g, '');
+            }
+
+            // Auto-advance to next input when maxlength is reached
+            if (this.value.length >= this.maxLength) {
+                const next = this.nextElementSibling?.nextElementSibling;
+                if (next && next.tagName === 'INPUT') {
+                    next.focus();
+                }
+            }
+        });
+
+        // Handle backspace
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && this.value.length === 0) {
+                const prev = this.previousElementSibling?.previousElementSibling;
+                if (prev && prev.tagName === 'INPUT') {
+                    e.preventDefault();
+                    prev.focus();
+                    prev.value = '';
+                }
+            }
+        });
+    });
+
+    // Form validation
+    document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+        const licensePlate = `${document.getElementById('state-code').value}-${document.getElementById('district-code').value}-${document.getElementById('letter-code').value}-${document.getElementById('number-code').value}`;
+        
+        // Create hidden input for combined license plate
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'vehicle-plate';
+        hiddenInput.value = licensePlate;
+        this.appendChild(hiddenInput);
+    });
+
+    // Preview CSV content
+    document.getElementById('csv-file').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // You can add preview logic here if needed
+            console.log('File selected:', file.name);
+        }
+    });
+    </script>
+</body>
+</html>
