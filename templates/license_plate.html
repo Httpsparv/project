@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Plate Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Copy the root variables and base styles from your other templates */
+        :root {
+            --bg-gradient-start: #f8fafc;
+            --bg-gradient-end: #e2e8f0;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #1a202c;
+            --text-secondary: #4a5568;
+            --button-bg: #3182ce;
+            --button-hover: #2c5282;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --border-color: rgba(203, 213, 224, 0.5);
+            --nav-height: 64px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+        }
+
+        /* Copy navigation styles from your other templates */
+        nav {
+            background: var(--card-bg);
+            height: var(--nav-height);
+            box-shadow: 0 2px 4px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: calc(var(--nav-height) + 2rem) auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .file-input-wrapper {
+            margin: 2rem 0;
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        .result.success {
+            background: #f0fff4;
+            border: 1px solid #68d391;
+            color: #2f855a;
+        }
+
+        .result.error {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--button-hover);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">Speed Monitor</div>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('management') }}">Vehicle Management</a>
+            <a href="{{ url_for('setting') }}">Settings</a>
+            <a href="{{ url_for('license_plate') }}" class="active">Detection</a>
+        </div>
+        <div class="logout-btn">
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section">
+            <div class="upload-container">
+                <h2>License Plate Detection</h2>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="file-input-wrapper">
+                        <input type="file" name="image" accept=".jpg,.jpeg,.png" required>
+                    </div>
+                    <button type="submit">Upload and Detect</button>
+                </form>
+                <div id="result" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const resultDiv = document.getElementById('result');
+            
+            fetch('/upload-plate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultDiv.style.display = 'block';
+                if (data.success) {
+                    resultDiv.innerHTML = `Detected plate number: ${data.plate_number}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `Error: ${data.error}`;
+                    resultDiv.className = 'result error';
+                }
+            })
+            .catch(error => {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = 'Error: ' + error;
+                resultDiv.className = 'result error';
+            });
+        };
+    </script>
+</body>
+</html> 
