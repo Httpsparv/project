@@ -17,8 +17,13 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Change this to a secure secret key
 
 # MongoDB connection
-client = MongoClient('mongodb://localhost:27017/')
-db = client['aonix_test']
+import os
+from pymongo import MongoClient
+
+# Replace with your actual MongoDB URI
+mongo_uri = 'mongodb+srv://parvebrahmbhatt1008:<8005723987>@cluster0.qxxrq.mongodb.net/'
+client = MongoClient(mongo_uri)
+db = client['aonix_test']  # Replace with your database name
 
 # Global variable to store the speed.py subprocess
 speed_process = None
